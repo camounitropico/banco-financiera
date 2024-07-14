@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -34,32 +36,35 @@ public class UserService {
 
     public User save(UserRequest userRequest) throws HttpClientException {
         try {
-        User user = new User();
-        user.setIdentificationType(userRequest.getIdentificationType());
-        user.setIdentificationNumber(userRequest.getIdentificationNumber());
-        validateAndSet(
-                StringValidator::isValidName,
-                userRequest::getFirstName,
-                user::setFirstName,
-                "Invalid first name"
-        );
-        validateAndSet(
-                StringValidator::isValidName,
-                userRequest::getLastName,
-                user::setLastName,
-                "Invalid last name"
-        );
-        validateAndSet(
-                StringValidator::isValidEmail,
-                userRequest::getEmail,
-                user::setEmail,
-                "Invalid email"
-        );
+            if (isUserOver18(userRequest.getBirthDate())) {
+                User user = new User();
+                user.setIdentificationType(userRequest.getIdentificationType());
+                user.setIdentificationNumber(userRequest.getIdentificationNumber());
+                validateAndSet(
+                        StringValidator::isValidName,
+                        userRequest::getFirstName,
+                        user::setFirstName,
+                        "Invalid first name"
+                );
+                validateAndSet(
+                        StringValidator::isValidName,
+                        userRequest::getLastName,
+                        user::setLastName,
+                        "Invalid last name"
+                );
+                validateAndSet(
+                        StringValidator::isValidEmail,
+                        userRequest::getEmail,
+                        user::setEmail,
+                        "Invalid email"
+                );
 
-        user.setEmail(userRequest.getEmail());
-        user.setBirthDate(userRequest.getBirthDate());
+                user.setEmail(userRequest.getEmail());
+                user.setBirthDate(userRequest.getBirthDate());
 
-            return userRepository.save(user);
+                return userRepository.save(user);
+            } else throw new IllegalArgumentException("invalid user, the user is not of legal age");
+
         } catch (Exception e) {
             throw new HttpClientException(HttpStatus.BAD_REQUEST, e);
         }
@@ -115,5 +120,9 @@ public class UserService {
         }
     }
 
-
+    public boolean isUserOver18(LocalDate birthDate) {
+        LocalDate now = LocalDate.now();
+        Period period = Period.between(birthDate, now);
+        return period.getYears() >= 18;
+    }
 }

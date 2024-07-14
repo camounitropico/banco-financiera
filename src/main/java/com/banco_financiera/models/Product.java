@@ -1,56 +1,59 @@
 package com.banco_financiera.models;
 
+import com.banco_financiera.enums.AccountStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.hibernate.type.descriptor.java.JdbcDateJavaType.DATE_FORMAT;
 
 @Data
 @Entity
-@Table(name = "users")
-public class User {
+@Table(name = "products")
+public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    @JsonProperty("identification_type")
-    private String identificationType;
+    @JsonProperty("account_type")
+    private String accountType;
 
     @Column(nullable = false, unique = true)
-    @JsonProperty("identification_number")
-    private Long identificationNumber;
+    @JsonProperty("account_number")
+    private String accountNumber;
 
     @Column(nullable = false)
-    @JsonProperty("first_name")
-    private String firstName;
+    @JsonProperty("status")
+    private String status = AccountStatus.ACTIVE.name();
 
     @Column(nullable = false)
-    @JsonProperty("last_name")
-    private String lastName;
-
-    @Column(nullable = false, unique = true)
-    private String email;
+    @JsonProperty("account_balance")
+    private Double accountBalance;
 
     @Column(nullable = false)
-    @JsonProperty("birth_date")
-    private LocalDate birthDate;
+    @JsonProperty("exenta_gmf")
+    private Boolean exentaGMF;
 
     @Column(nullable = false, updatable = false)
     @DateTimeFormat(pattern = DATE_FORMAT)
-    @JsonProperty("created_at")
+    @CreatedDate
     private LocalDateTime createdAt;
 
     @Column(nullable = false)
     @DateTimeFormat(pattern = DATE_FORMAT)
-    @JsonProperty("updated_at")
+    @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    private User user;
 
     @PrePersist
     protected void onCreate() {
