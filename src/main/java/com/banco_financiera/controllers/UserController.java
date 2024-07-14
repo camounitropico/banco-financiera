@@ -1,5 +1,6 @@
 package com.banco_financiera.controllers;
 
+import com.banco_financiera.core.exceptions.HttpClientException;
 import com.banco_financiera.models.User;
 import com.banco_financiera.requests.UserRequest;
 import com.banco_financiera.services.UserService;
@@ -22,26 +23,27 @@ public class UserController {
         return "i am up";
     }
 
-    @GetMapping
+    @GetMapping("/get-all")
     public Iterable<User> getAllUsers() {
         return userService.findAll();
     }
 
     @GetMapping("/{identification_number}")
-    public ResponseEntity<User> getUserById(@PathVariable Long identificationNumber) {
-        Optional<User> user = userService.findById(identificationNumber);
+    public ResponseEntity<User> getUserById(@PathVariable Long identification_number) {
+        Optional<User> user = userService.findByIdentificationNumber(identification_number);
         return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
     @PostMapping("/create")
-    public User createUser(@RequestBody UserRequest userRequest) {
+    public User createUser(@RequestBody UserRequest userRequest) throws HttpClientException {
         return userService.save(userRequest);
     }
 
     @PutMapping("/{identification_number}")
-    public ResponseEntity<User> updateUser(@PathVariable Long identificationNumber, @RequestBody UserRequest userDetails) {
-        Optional<User> user = userService.findById(identificationNumber);
+    public ResponseEntity<User> updateUser(@PathVariable Long identification_number, @RequestBody UserRequest userDetails) throws HttpClientException {
+        Optional<User> user = userService.findByIdentificationNumber(identification_number);
         if (user.isPresent()) {
+            userDetails.setIdentificationNumber(identification_number);
             return ResponseEntity.ok(userService.save(userDetails));
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -49,9 +51,9 @@ public class UserController {
     }
 
     @DeleteMapping("/{identification_number}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long identificationNumber) {
-        if (userService.findById(identificationNumber).isPresent()) {
-            userService.deleteById(identificationNumber);
+    public ResponseEntity<Void> deleteUser(@PathVariable Long identification_number) {
+        if (userService.findByIdentificationNumber(identification_number).isPresent()) {
+            userService.deleteByIdentificationNumber(identification_number);
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
