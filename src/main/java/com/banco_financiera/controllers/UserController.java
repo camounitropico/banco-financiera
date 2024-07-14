@@ -44,7 +44,7 @@ public class UserController {
         Optional<User> user = userService.findByIdentificationNumber(identification_number);
         if (user.isPresent()) {
             userDetails.setIdentificationNumber(identification_number);
-            return ResponseEntity.ok(userService.save(userDetails));
+            return ResponseEntity.ok(userService.upDateUser(userDetails, user.get()));
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }

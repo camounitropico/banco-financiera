@@ -73,6 +73,38 @@ public class UserService {
         userRepository.deleteByIdentificationNumber(identificationNumber);
     }
 
+    public User upDateUser(UserRequest userRequest, User user) throws HttpClientException {
+        try {
+            user.setIdentificationType(userRequest.getIdentificationType());
+            user.setIdentificationNumber(userRequest.getIdentificationNumber());
+            validateAndSet(
+                    StringValidator::isValidName,
+                    userRequest::getFirstName,
+                    user::setFirstName,
+                    "Invalid first name"
+            );
+            validateAndSet(
+                    StringValidator::isValidName,
+                    userRequest::getLastName,
+                    user::setLastName,
+                    "Invalid last name"
+            );
+            validateAndSet(
+                    StringValidator::isValidEmail,
+                    userRequest::getEmail,
+                    user::setEmail,
+                    "Invalid email"
+            );
+
+            user.setEmail(userRequest.getEmail());
+            user.setBirthDate(userRequest.getBirthDate());
+
+            return userRepository.save(user);
+        } catch (Exception e) {
+            throw new HttpClientException(HttpStatus.BAD_REQUEST, e);
+        }
+    }
+
     private void validateAndSet(
             Predicate<String> validator,
             Supplier<String> valueSupplier,
@@ -86,4 +118,6 @@ public class UserService {
             throw new IllegalArgumentException(errorMessage);
         }
     }
+
+
 }
