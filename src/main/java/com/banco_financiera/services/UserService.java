@@ -69,10 +69,6 @@ public class UserService {
         userRepository.deleteById(identificationNumber);
     }
 
-    public void deleteByIdentificationNumber(Long identificationNumber) {
-        userRepository.deleteByIdentificationNumber(identificationNumber);
-    }
-
     public User upDateUser(UserRequest userRequest, User user) throws HttpClientException {
         try {
             user.setIdentificationType(userRequest.getIdentificationType());
