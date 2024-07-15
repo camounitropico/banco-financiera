@@ -18,13 +18,11 @@ import java.util.Random;
 @Service
 public class ProductService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final ProductRepository productRepository;
 
-    @Autowired
-    private ProductRepository productRepository;
-
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(UserRepository userRepository, ProductRepository productRepository) {
+        this.userRepository = userRepository;
         this.productRepository = productRepository;
     }
 

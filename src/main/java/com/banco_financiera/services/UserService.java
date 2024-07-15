@@ -38,36 +38,41 @@ public class UserService {
         try {
             if (isUserOver18(userRequest.getBirthDate())) {
                 User user = new User();
-                user.setIdentificationType(userRequest.getIdentificationType());
-                user.setIdentificationNumber(userRequest.getIdentificationNumber());
-                validateAndSet(
-                        StringValidator::isValidName,
-                        userRequest::getFirstName,
-                        user::setFirstName,
-                        "Invalid first name"
-                );
-                validateAndSet(
-                        StringValidator::isValidName,
-                        userRequest::getLastName,
-                        user::setLastName,
-                        "Invalid last name"
-                );
-                validateAndSet(
-                        StringValidator::isValidEmail,
-                        userRequest::getEmail,
-                        user::setEmail,
-                        "Invalid email"
-                );
-
-                user.setEmail(userRequest.getEmail());
-                user.setBirthDate(userRequest.getBirthDate());
-
-                return userRepository.save(user);
+                return getUser(userRequest, user);
             } else throw new IllegalArgumentException("invalid user, the user is not of legal age");
 
         } catch (Exception e) {
             throw new HttpClientException(HttpStatus.BAD_REQUEST, e);
         }
+    }
+
+
+    private User getUser(UserRequest userRequest, User user) {
+        user.setIdentificationType(userRequest.getIdentificationType());
+        user.setIdentificationNumber(userRequest.getIdentificationNumber());
+        validateAndSet(
+                StringValidator::isValidName,
+                userRequest::getFirstName,
+                user::setFirstName,
+                "Invalid first name"
+        );
+        validateAndSet(
+                StringValidator::isValidName,
+                userRequest::getLastName,
+                user::setLastName,
+                "Invalid last name"
+        );
+        validateAndSet(
+                StringValidator::isValidEmail,
+                userRequest::getEmail,
+                user::setEmail,
+                "Invalid email"
+        );
+
+        user.setEmail(userRequest.getEmail());
+        user.setBirthDate(userRequest.getBirthDate());
+
+        return userRepository.save(user);
     }
 
     public void deleteById(Long identificationNumber) {
@@ -76,31 +81,7 @@ public class UserService {
 
     public User upDateUser(UserRequest userRequest, User user) throws HttpClientException {
         try {
-            user.setIdentificationType(userRequest.getIdentificationType());
-            user.setIdentificationNumber(userRequest.getIdentificationNumber());
-            validateAndSet(
-                    StringValidator::isValidName,
-                    userRequest::getFirstName,
-                    user::setFirstName,
-                    "Invalid first name"
-            );
-            validateAndSet(
-                    StringValidator::isValidName,
-                    userRequest::getLastName,
-                    user::setLastName,
-                    "Invalid last name"
-            );
-            validateAndSet(
-                    StringValidator::isValidEmail,
-                    userRequest::getEmail,
-                    user::setEmail,
-                    "Invalid email"
-            );
-
-            user.setEmail(userRequest.getEmail());
-            user.setBirthDate(userRequest.getBirthDate());
-
-            return userRepository.save(user);
+            return getUser(userRequest, user);
         } catch (Exception e) {
             throw new HttpClientException(HttpStatus.BAD_REQUEST, e);
         }

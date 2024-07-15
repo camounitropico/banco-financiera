@@ -14,7 +14,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpClientException.class)
     public ResponseEntity<Map<String, String>> handleCustomException(HttpClientException error) {
         Map<String, String> body = new HashMap<>();
-        body.put("error", "ha sucedido algo extraño");
+        body.put("error", "something strange has happened");
         body.put("cause", error.getCause() != null ? error.getCause().getLocalizedMessage() : "");
 
         return ResponseEntity

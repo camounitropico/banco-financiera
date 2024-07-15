@@ -14,8 +14,6 @@ import org.mockito.MockitoAnnotations;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 public class ProductServiceTest {
@@ -27,7 +25,7 @@ public class ProductServiceTest {
     ProductRepository productRepository;
 
     @Mock
-    UserService userService;
+    UserRepository userRepository;
 
     @BeforeEach
     public void init() {
@@ -59,9 +57,12 @@ public class ProductServiceTest {
     public void shouldSaveProductSuccessfully() throws HttpClientException {
         Product product = new Product();
         product.setId(123L);
+        product.setAccountType("savings");
+        product.setAccountBalance(2000.0);
         User user = new User();
         user.setId(1L);
-        when(userService.findById(1L)).thenReturn(Optional.of(user));
+        product.setUser(user);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(productRepository.save(product)).thenReturn(product);
 
         Product response = productService.saveProduct(product, 1L);
@@ -73,7 +74,7 @@ public class ProductServiceTest {
     public void shouldThrowExceptionWhenUserDoesNotExist() {
         Product product = new Product();
         product.setId(123L);
-        when(userService.findById(1L)).thenReturn(Optional.empty());
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(HttpClientException.class, () -> productService.saveProduct(product, 1L));
     }

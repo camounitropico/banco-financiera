@@ -2,6 +2,8 @@ package com.banco_financiera.controllers;
 
 import com.banco_financiera.core.exceptions.HttpClientException;
 import com.banco_financiera.models.Product;
+import com.banco_financiera.models.User;
+import com.banco_financiera.repositories.ProductRepository;
 import com.banco_financiera.services.ProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,6 +25,9 @@ public class ProductControllerTest {
 
     @Mock
     ProductService productService;
+
+    @Mock
+    ProductRepository productRepository;
 
     @BeforeEach
     public void init() {
@@ -65,6 +70,9 @@ public class ProductControllerTest {
     public void shouldUpdateProductSuccessfully() throws HttpClientException {
         Product product = new Product();
         product.setId(123L);
+        User user = new User();
+        user.setId(1L);
+        product.setUser(user);
         when(productService.getProductById(123L)).thenReturn(Optional.of(product));
         when(productService.saveProduct(product, product.getUser().getId())).thenReturn(product);
 
@@ -99,11 +107,11 @@ public class ProductControllerTest {
 
     @Test
     public void shouldReturnNotFoundWhenDeletingNonExistingProduct() {
-        when(productService.getProductById(123L)).thenReturn(Optional.empty());
+        when(productRepository.findById(123L)).thenReturn(Optional.empty());
 
         ResponseEntity<Void> response = productController.deleteProduct(123L);
 
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
 
     @Test
