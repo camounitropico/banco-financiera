@@ -46,7 +46,6 @@ public class UserService {
         }
     }
 
-
     private User getUser(UserRequest userRequest, User user) {
         user.setIdentificationType(userRequest.getIdentificationType());
         user.setIdentificationNumber(userRequest.getIdentificationNumber());

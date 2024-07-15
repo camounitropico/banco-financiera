@@ -13,6 +13,7 @@ import org.mockito.MockitoAnnotations;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 public class UserServiceTest {
@@ -32,9 +33,20 @@ public class UserServiceTest {
     public void saveShouldReturnUserWhenUserIsOver18() throws HttpClientException {
         UserRequest userRequest = new UserRequest();
         userRequest.setBirthDate(LocalDate.now().minusYears(20));
+        userRequest.setFirstName("John");
+        userRequest.setIdentificationNumber(123456789L);
+        userRequest.setIdentificationType("DNI");
+        userRequest.setLastName("Doe");
+        userRequest.setEmail("hello@iam.com");
         User user = new User();
         user.setId(123L);
-        when(userRepository.save(user)).thenReturn(user);
+        user.setBirthDate(LocalDate.now().minusYears(20));
+        user.setFirstName("John");
+        user.setIdentificationNumber(123456789L);
+        user.setIdentificationType("DNI");
+        user.setLastName("Doe");
+        user.setEmail("hello@iam.com");
+        when(userRepository.save(any())).thenReturn(user);
 
         User response = userService.save(userRequest);
 
@@ -46,15 +58,26 @@ public class UserServiceTest {
         UserRequest userRequest = new UserRequest();
         userRequest.setBirthDate(LocalDate.now().minusYears(17));
 
-        assertThrows(IllegalArgumentException.class, () -> userService.save(userRequest));
+        assertThrows(HttpClientException.class, () -> userService.save(userRequest));
     }
 
     @Test
     public void upDateUserShouldReturnUpdatedUser() throws HttpClientException {
         UserRequest userRequest = new UserRequest();
         userRequest.setBirthDate(LocalDate.now().minusYears(20));
+        userRequest.setFirstName("John");
+        userRequest.setIdentificationNumber(123456789L);
+        userRequest.setIdentificationType("DNI");
+        userRequest.setLastName("Doe");
+        userRequest.setEmail("hello@iam.com");
         User user = new User();
         user.setId(123L);
+        user.setBirthDate(LocalDate.now().minusYears(20));
+        user.setFirstName("John");
+        user.setIdentificationNumber(123456789L);
+        user.setIdentificationType("DNI");
+        user.setLastName("Doe");
+        user.setEmail("hello@iam.com");
         when(userRepository.save(user)).thenReturn(user);
 
         User response = userService.upDateUser(userRequest, user);
