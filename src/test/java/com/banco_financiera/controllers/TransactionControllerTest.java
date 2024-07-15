@@ -1,6 +1,7 @@
 package com.banco_financiera.controllers;
 
 import com.banco_financiera.models.Transaction;
+import com.banco_financiera.requests.TransactionRequest;
 import com.banco_financiera.services.TransactionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,9 +31,11 @@ public class TransactionControllerTest {
     public void shouldCreateDepositTransactionSuccessfully() {
         Transaction transaction = new Transaction();
         transaction.setId(1L);
+        TransactionRequest transactionRequest = new TransactionRequest();
+        transactionRequest.setAmount(100.0);
         when(transactionService.deposit(1L, 100.0)).thenReturn(transaction);
 
-        ResponseEntity<Transaction> response = transactionController.deposit(1L, 100.0);
+        ResponseEntity<Transaction> response = transactionController.deposit(1L, transactionRequest);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(1L, response.getBody().getId());
@@ -42,9 +45,11 @@ public class TransactionControllerTest {
     public void shouldCreateWithdrawTransactionSuccessfully() {
         Transaction transaction = new Transaction();
         transaction.setId(1L);
+        TransactionRequest transactionRequest = new TransactionRequest();
+        transactionRequest.setAmount(100.0);
         when(transactionService.withdraw(1L, 100.0)).thenReturn(transaction);
 
-        ResponseEntity<Transaction> response = transactionController.withdraw(1L, 100.0);
+        ResponseEntity<Transaction> response = transactionController.withdraw(1L, transactionRequest);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(1L, response.getBody().getId());
@@ -53,10 +58,12 @@ public class TransactionControllerTest {
     @Test
     public void shouldCreateTransferTransactionSuccessfully() {
         Transaction transaction = new Transaction();
+        TransactionRequest transactionRequest = new TransactionRequest();
+        transactionRequest.setAmount(100.0);
         transaction.setId(1L);
         when(transactionService.transfer(1L, 2L, 100.0)).thenReturn(transaction);
 
-        ResponseEntity<Transaction> response = transactionController.transfer(1L, 2L, 100.0);
+        ResponseEntity<Transaction> response = transactionController.transfer(1L, 2L, transactionRequest);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(1L, response.getBody().getId());

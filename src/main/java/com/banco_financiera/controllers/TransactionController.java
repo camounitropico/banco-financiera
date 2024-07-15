@@ -1,6 +1,7 @@
 package com.banco_financiera.controllers;
 
 import com.banco_financiera.models.Transaction;
+import com.banco_financiera.requests.TransactionRequest;
 import com.banco_financiera.services.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,21 +20,21 @@ public class TransactionController {
         this.transactionService = transactionService;
     }
 
-    @PostMapping("/deposit/{productId}")
-    public ResponseEntity<Transaction> deposit(@PathVariable Long productId, @RequestBody Double amount) {
-        Transaction transaction = transactionService.deposit(productId, amount);
+    @PostMapping("/deposit/{product_id}")
+    public ResponseEntity<Transaction> deposit(@PathVariable("product_id") Long productId, @RequestBody TransactionRequest transactionRequest) {
+        Transaction transaction = transactionService.deposit(productId, transactionRequest.getAmount());
         return new ResponseEntity<>(transaction, HttpStatus.CREATED);
     }
 
-    @PostMapping("/withdraw/{productId}")
-    public ResponseEntity<Transaction> withdraw(@PathVariable Long productId, @RequestBody Double amount) {
-        Transaction transaction = transactionService.withdraw(productId, amount);
+    @PostMapping("/withdraw/{product_id}")
+    public ResponseEntity<Transaction> withdraw(@PathVariable("product_id") Long productId, @RequestBody TransactionRequest transactionRequest) {
+        Transaction transaction = transactionService.withdraw(productId, transactionRequest.getAmount());
         return new ResponseEntity<>(transaction, HttpStatus.CREATED);
     }
 
-    @PostMapping("/transfer/{fromProductId}/{toProductId}")
-    public ResponseEntity<Transaction> transfer(@PathVariable Long fromProductId, @PathVariable Long toProductId, @RequestBody Double amount) {
-        Transaction transaction = transactionService.transfer(fromProductId, toProductId, amount);
+    @PostMapping("/transfer/{from_product_id}/{to_product_id}")
+    public ResponseEntity<Transaction> transfer(@PathVariable("from_product_id") Long fromProductId, @PathVariable("to_product_id") Long toProductId, @RequestBody TransactionRequest transactionRequest) {
+        Transaction transaction = transactionService.transfer(fromProductId, toProductId, transactionRequest.getAmount());
         return new ResponseEntity<>(transaction, HttpStatus.CREATED);
     }
 }

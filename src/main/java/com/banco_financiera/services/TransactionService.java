@@ -1,5 +1,6 @@
 package com.banco_financiera.services;
 
+import com.banco_financiera.enums.TransactionType;
 import com.banco_financiera.models.Product;
 import com.banco_financiera.models.Transaction;
 import com.banco_financiera.repositories.ProductRepository;
@@ -23,7 +24,7 @@ public class TransactionService {
         productRepository.save(product);
 
         Transaction transaction = new Transaction();
-        transaction.setTransactionType("DEPOSIT");
+        transaction.setTransactionType(TransactionType.DEPOSIT.name());
         transaction.setAmount(amount);
         transaction.setProduct(product);
 
@@ -40,7 +41,7 @@ public class TransactionService {
         productRepository.save(product);
 
         Transaction transaction = new Transaction();
-        transaction.setTransactionType("WITHDRAW");
+        transaction.setTransactionType(TransactionType.WITHDRAW.name());
         transaction.setAmount(amount);
         transaction.setProduct(product);
 
@@ -64,7 +65,7 @@ public class TransactionService {
         productRepository.save(toProduct);
 
         Transaction transaction = new Transaction();
-        transaction.setTransactionType("TRANSFER");
+        transaction.setTransactionType(TransactionType.TRANSFER.name());
         transaction.setAmount(amount);
         transaction.setProduct(fromProduct);
 
