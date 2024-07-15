@@ -29,8 +29,8 @@ public class UserController {
     }
 
     @GetMapping("/{identification_number}")
-    public ResponseEntity<User> getUserById(@PathVariable Long identification_number) {
-        Optional<User> user = userService.findByIdentificationNumber(identification_number);
+    public ResponseEntity<User> getUserById(@PathVariable("identification_number") Long identificationNumber) {
+        Optional<User> user = userService.findByIdentificationNumber(identificationNumber);
         return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
@@ -40,10 +40,10 @@ public class UserController {
     }
 
     @PutMapping("/{identification_number}")
-    public ResponseEntity<User> updateUser(@PathVariable Long identification_number, @RequestBody UserRequest userDetails) throws HttpClientException {
-        Optional<User> user = userService.findByIdentificationNumber(identification_number);
+    public ResponseEntity<User> updateUser(@PathVariable("identification_number") Long identificationNumber, @RequestBody UserRequest userDetails) throws HttpClientException {
+        Optional<User> user = userService.findByIdentificationNumber(identificationNumber);
         if (user.isPresent()) {
-            userDetails.setIdentificationNumber(identification_number);
+            userDetails.setIdentificationNumber(identificationNumber);
             return ResponseEntity.ok(userService.upDateUser(userDetails, user.get()));
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -51,8 +51,8 @@ public class UserController {
     }
 
     @DeleteMapping("/{identification_number}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long identification_number) {
-        Optional<User> user = userService.findByIdentificationNumber(identification_number);
+    public ResponseEntity<Void> deleteUser(@PathVariable("identification_number") Long identificationNumber) {
+        Optional<User> user = userService.findByIdentificationNumber(identificationNumber);
         if (user.isPresent()) {
             userService.deleteById(user.get().getId());
             return ResponseEntity.ok().build();

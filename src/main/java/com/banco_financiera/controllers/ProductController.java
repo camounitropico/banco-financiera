@@ -32,8 +32,8 @@ public class ProductController {
     }
 
     @PostMapping("/create/{user_id}")
-    public Product createProduct(@RequestBody Product product, @PathVariable Long user_id) throws HttpClientException {
-        return productService.saveProduct(product, user_id);
+    public Product createProduct(@RequestBody Product product, @PathVariable("user_id") Long userId) throws HttpClientException {
+        return productService.saveProduct(product, userId);
     }
 
     @PutMapping("/{id}")

@@ -37,7 +37,7 @@ public class Product {
     @JsonProperty("account_balance")
     private Double accountBalance;
 
-    @Column(nullable = false)
+    @Column(name = "exenta_gmf", nullable = false)
     @JsonProperty("exenta_gmf")
     private Boolean exentaGMF;
 
