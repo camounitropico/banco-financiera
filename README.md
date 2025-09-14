@@ -100,6 +100,68 @@ SPRING_PROFILES_ACTIVE=dev ./gradlew bootRun
 - **API Docs**: http://localhost:8080/v3/api-docs
 - **pgAdmin**: http://localhost:8081 (admin@bancofin.com / admin)
 
+## 📚 Interactive API Documentation (Swagger/OpenAPI)
+
+### Overview
+The application automatically generates comprehensive API documentation using **SpringDoc OpenAPI 3**. No static files needed - everything is generated from your code annotations.
+
+### How It Works
+1. **Annotations in Controllers** → Automatic documentation
+2. **DTO Validations** → Schema generation with constraints
+3. **Live Testing** → Execute requests directly from the UI
+
+### Accessing Documentation
+
+**📋 Requirements**: Application must be running locally
+
+#### 🌐 Web Interface (Recommended)
+```bash
+# Interactive Swagger UI
+http://localhost:8080/swagger-ui.html
+
+# Features:
+# ✅ Try endpoints directly
+# ✅ Built-in authentication
+# ✅ Automatic request/response examples
+# ✅ Schema validation in real-time
+```
+
+#### 📄 JSON Specification
+```bash
+# Raw OpenAPI 3.0 JSON
+http://localhost:8080/v3/api-docs
+
+# Use for:
+# - Importing into Postman
+# - Code generation tools
+# - External documentation tools
+```
+
+### Authentication in Swagger UI
+1. Click **"Authorize"** button (🔒)
+2. Select **"basicAuth"**
+3. Enter credentials:
+   - **Username**: `user`
+   - **Password**: `password`
+4. Click **"Authorize"**
+5. Now you can test all endpoints directly
+
+### What's Automatically Documented
+- ✅ **All endpoints** with descriptions
+- ✅ **Request/Response schemas** from DTOs
+- ✅ **Validation rules** (`@NotNull`, `@Email`, etc.)
+- ✅ **Error responses** with status codes
+- ✅ **Authentication requirements**
+- ✅ **Business logic descriptions**
+
+### Example: Testing User Creation
+1. Go to `/swagger-ui.html`
+2. Authorize with basic auth
+3. Find **"Users"** → **POST** `/api/v1/banco-financiera/users`
+4. Click **"Try it out"**
+5. The form auto-populates with required fields
+6. Execute and see real response
+
 ## 🔐 Authentication
 
 The application uses Basic Authentication with the following default credentials:
