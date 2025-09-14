@@ -1,9 +1,11 @@
 package com.banco_financiera.services;
 
 import com.banco_financiera.core.exceptions.HttpClientException;
+import com.banco_financiera.dto.UserRequestDTO;
+import com.banco_financiera.dto.UserResponseDTO;
 import com.banco_financiera.models.User;
 import com.banco_financiera.repositories.UserRepository;
-import com.banco_financiera.requests.UserRequest;
+import com.banco_financiera.mapper.UserMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -19,10 +21,13 @@ import static org.mockito.Mockito.when;
 public class UserServiceTest {
 
     @InjectMocks
-    UserService userService;
+    UserServiceImpl userService;
 
     @Mock
     UserRepository userRepository;
+
+    @Mock
+    UserMapper userMapper;
 
     @BeforeEach
     public void init() {
@@ -30,23 +35,21 @@ public class UserServiceTest {
     }
 
     @Test
-    public void saveShouldReturnUserWhenUserIsOver18() throws HttpClientException {
-        UserRequest userRequest = new UserRequest();
+    public void createUserShouldReturnUserWhenUserIsOver18() throws HttpClientException {
+        UserRequestDTO userRequest = new UserRequestDTO();
         userRequest.setBirthDate(LocalDate.now().minusYears(20));
         userRequest.setFirstName("John");
         userRequest.setIdentificationNumber(123456789L);
-        userRequest.setIdentificationType("DNI");
+        userRequest.setIdentificationType("CC");
         userRequest.setLastName("Doe");
         userRequest.setEmail("hello@iam.com");
         User user = new User();
         user.setId(123L);
-        user.setBirthDate(LocalDate.now().minusYears(20));
-        user.setFirstName("John");
-        user.setIdentificationNumber(123456789L);
-        user.setIdentificationType("DNI");
-        user.setLastName("Doe");
-        user.setEmail("hello@iam.com");
+        UserResponseDTO userResponse = new UserResponseDTO();
+        userResponse.setIdentificationNumber(123456789L);
+        when(userMapper.toEntity(userRequest)).thenReturn(user);
         when(userRepository.save(any())).thenReturn(user);
+        when(userMapper.toResponseDTO(user)).thenReturn(userResponse);
 
         User response = userService.save(userRequest);
 
