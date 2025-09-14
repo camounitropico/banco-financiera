@@ -27,30 +27,11 @@ cd banco-financiera
 
 ### 2. Levantar la Base de Datos
 ```bash
-# Crear archivo docker-compose.yml en la raíz del proyecto
-cat > docker-compose.yml << EOF
-version: '3.8'
-services:
-  postgres:
-    image: postgres:15
-    container_name: banco-financiera-db
-    environment:
-      - POSTGRES_DB=banco-financiera
-      - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=admin
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+# El proyecto ya incluye docker-compose.yml con PostgreSQL y pgAdmin
+# Levantar la base de datos y pgAdmin
+docker compose up -d
 
-volumes:
-  postgres_data:
-EOF
-
-# Levantar la base de datos
-docker-compose up -d
-
-# Verificar que esté corriendo
+# Verificar que estén corriendo
 docker ps
 ```
 
@@ -70,6 +51,11 @@ curl http://localhost:8080/actuator/health
 
 # Swagger UI (abrir en navegador)
 http://localhost:8080/swagger-ui.html
+
+# pgAdmin (abrir en navegador)
+http://localhost:8081
+# Usuario: admin@bancofin.com
+# Contraseña: admin
 ```
 
 ## 🔐 Autenticación
@@ -302,7 +288,7 @@ curl -X GET 'localhost:8080/api/v1/banco-financiera/products' \
 
 #### GET - Producto por ID
 ```bash
-curl -X GET 'localhost:8080/api/v1/products/1' \
+curl -X GET 'localhost:8080/api/v1/banco-financiera/products/1' \
   -H 'Authorization: Basic dXNlcjpwYXNzd29yZA=='
 ```
 
@@ -321,22 +307,14 @@ curl -X POST 'localhost:8080/api/v1/banco-financiera/products' \
 
 #### PUT - Actualizar Estado de Producto
 ```bash
-curl -X PUT 'localhost:8080/api/v1/products/1/status' \
-  -H 'Authorization: Basic dXNlcjpwYXNzd29yZA==' \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "status": "inactive"
-  }'
+curl -X PUT "localhost:8080/api/v1/banco-financiera/products/1/status?status=INACTIVE" \
+  -H 'Authorization: Basic dXNlcjpwYXNzd29yZA=='
 ```
 
 #### DELETE - Eliminar Producto (solo si saldo = 0)
 ```bash
-curl -X DELETE 'localhost:8080/api/v1/products/1' \
-  -H 'Authorization: Basic dXNlcjpwYXNzd29yZA==' \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "status": "inactive"
-  }'
+curl -X DELETE 'localhost:8080/api/v1/banco-financiera/products/1' \
+  -H 'Authorization: Basic dXNlcjpwYXNzd29yZA=='
 ```
 
 ### Endpoints de Transacciones
@@ -363,7 +341,7 @@ curl -X POST 'localhost:8080/api/v1/banco-financiera/transactions/1/withdraw' \
 
 #### POST - Transferencia
 ```bash
-curl -X POST 'localhost:8080/api/v1/transactions/transfer/1/2' \
+curl -X POST 'localhost:8080/api/v1/banco-financiera/transactions/1/transfer/2' \
   -H 'Authorization: Basic dXNlcjpwYXNzd29yZA==' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -461,7 +439,7 @@ curl -X POST 'localhost:8080/api/v1/banco-financiera/transactions/1/withdraw' \
 
 #### Transferencia a la Misma Cuenta
 ```bash
-curl -X POST 'localhost:8080/api/v1/transactions/transfer/1/1' \
+curl -X POST 'localhost:8080/api/v1/banco-financiera/transactions/1/transfer/1' \
   -H 'Authorization: Basic dXNlcjpwYXNzd29yZA==' \
   -H 'Content-Type: application/json' \
   -d '{

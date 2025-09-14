@@ -27,36 +27,52 @@ Enterprise-grade REST API for financial institution customer management. This ap
 ## 🚀 Quick Start
 
 ### 1. Database Setup
-Create a `docker-compose.yml` file:
+Use the included `docker-compose.yml` file:
 
 ```yaml
 version: '3.8'
 services:
   postgres:
-    image: postgres:15
-    container_name: banco-financiera-db
+    image: postgres:15-alpine
+    container_name: banco-financiera-postgres
     environment:
-      - POSTGRES_DB=banco-financiera
-      - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=admin
+      POSTGRES_DB: banco-financiera
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    networks:
-      - banco-network
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d banco-financiera"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: banco-financiera-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@bancofin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8081:80"
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
 
 volumes:
   postgres_data:
-
-networks:
-  banco-network:
-    driver: bridge
+  pgadmin_data:
 ```
 
-Start the database:
+Start the database and pgAdmin:
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 ### 2. Application Setup
@@ -82,6 +98,7 @@ SPRING_PROFILES_ACTIVE=dev ./gradlew bootRun
 - **Swagger UI**: http://localhost:8080/swagger-ui.html
 - **Health Check**: http://localhost:8080/actuator/health
 - **API Docs**: http://localhost:8080/v3/api-docs
+- **pgAdmin**: http://localhost:8081 (admin@bancofin.com / admin)
 
 ## 🔐 Authentication
 
@@ -124,7 +141,7 @@ SECURITY_USER_PASSWORD=your_password
 
 #### Create User
 ```bash
-curl -X POST 'localhost:8080/api/v1/user/create' \
+curl -X POST 'localhost:8080/api/v1/banco-financiera/users' \
   -H 'Authorization: Basic dXNlcjpwYXNzd29yZA==' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -139,23 +156,24 @@ curl -X POST 'localhost:8080/api/v1/user/create' \
 
 #### Get All Users
 ```bash
-curl -X GET 'localhost:8080/api/v1/user/get-all' \
+curl -X GET 'localhost:8080/api/v1/banco-financiera/users' \
   -H 'Authorization: Basic dXNlcjpwYXNzd29yZA=='
 ```
 
 #### Find User by Identification
 ```bash
-curl -X GET 'localhost:8080/api/v1/user/12345678915' \
+curl -X GET 'localhost:8080/api/v1/banco-financiera/users/12345678915' \
   -H 'Authorization: Basic dXNlcjpwYXNzd29yZA=='
 ```
 
 #### Update User
 ```bash
-curl -X PUT 'localhost:8080/api/v1/user/12345678910' \
+curl -X PUT 'localhost:8080/api/v1/banco-financiera/users/12345678910' \
   -H 'Authorization: Basic dXNlcjpwYXNzd29yZA==' \
   -H 'Content-Type: application/json' \
   -d '{
     "identification_type": "CC",
+    "identification_number": 12345678910,
     "first_name": "juan",
     "last_name": "ibanez",
     "email": "soytu@soyyo.com",
@@ -165,7 +183,7 @@ curl -X PUT 'localhost:8080/api/v1/user/12345678910' \
 
 #### Delete User
 ```bash
-curl -X DELETE 'localhost:8080/api/v1/user/12345678910' \
+curl -X DELETE 'localhost:8080/api/v1/banco-financiera/users/12345678910' \
   -H 'Authorization: Basic dXNlcjpwYXNzd29yZA=='
 ```
 
@@ -173,7 +191,7 @@ curl -X DELETE 'localhost:8080/api/v1/user/12345678910' \
 
 #### Create Product
 ```bash
-curl -X POST 'localhost:8080/api/v1/products/create/2' \
+curl -X POST 'localhost:8080/api/v1/banco-financiera/products' \
   -H 'Authorization: Basic dXNlcjpwYXNzd29yZA==' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -186,13 +204,13 @@ curl -X POST 'localhost:8080/api/v1/products/create/2' \
 
 #### Get All Products
 ```bash
-curl -X GET 'localhost:8080/api/v1/products/all' \
+curl -X GET 'localhost:8080/api/v1/banco-financiera/products' \
   -H 'Authorization: Basic dXNlcjpwYXNzd29yZA=='
 ```
 
 #### Get Product by ID
 ```bash
-curl -X GET 'localhost:8080/api/v1/products/{id}' \
+curl -X GET 'localhost:8080/api/v1/banco-financiera/products/{id}' \
   -H 'Authorization: Basic dXNlcjpwYXNzd29yZA=='
 ```
 
@@ -200,7 +218,7 @@ curl -X GET 'localhost:8080/api/v1/products/{id}' \
 
 #### Deposit
 ```bash
-curl -X POST 'localhost:8080/api/v1/transactions/deposit/1' \
+curl -X POST 'localhost:8080/api/v1/banco-financiera/transactions/1/deposit' \
   -H 'Authorization: Basic dXNlcjpwYXNzd29yZA==' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -210,7 +228,7 @@ curl -X POST 'localhost:8080/api/v1/transactions/deposit/1' \
 
 #### Withdrawal
 ```bash
-curl -X POST 'localhost:8080/api/v1/transactions/withdraw/1' \
+curl -X POST 'localhost:8080/api/v1/banco-financiera/transactions/1/withdraw' \
   -H 'Authorization: Basic dXNlcjpwYXNzd29yZA==' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -220,7 +238,7 @@ curl -X POST 'localhost:8080/api/v1/transactions/withdraw/1' \
 
 #### Transfer
 ```bash
-curl -X POST 'localhost:8080/api/v1/transactions/transfer/2/1' \
+curl -X POST 'localhost:8080/api/v1/banco-financiera/transactions/1/transfer/2' \
   -H 'Authorization: Basic dXNlcjpwYXNzd29yZA==' \
   -H 'Content-Type: application/json' \
   -d '{
