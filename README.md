@@ -1,147 +1,311 @@
-# banco-financiera
-## Description
+# 🏦 Banco Financiera API
 
-This is an application for managing customers of a financial institution. It allows the registration, updating, and deletion of customers, the creation of financial products for customers, and the execution of transactional movements in these products.
+## 📋 Description
 
-## Requirements
+Enterprise-grade REST API for financial institution customer management. This application provides comprehensive functionality for customer registration, financial product creation, and transactional operations with robust validation, error handling, and security features.
 
-- Java 17
-- Gradle
-- postgresql
+## ✨ Features
 
-## Instructions to start the project
+- 👥 **Customer Management**: Complete CRUD operations for customers
+- 💳 **Financial Products**: Account creation and management (savings/current)
+- 💰 **Transactions**: Deposits, withdrawals, and transfers between accounts
+- 🛡️ **Security**: Basic authentication with BCrypt encryption
+- 📚 **API Documentation**: Interactive Swagger UI
+- ✅ **Validation**: Comprehensive input validation with Bean Validation
+- 🚨 **Error Handling**: Structured exception handling by layers
+- 📊 **Monitoring**: Health checks and metrics via Spring Actuator
+- 🔄 **Transaction Management**: ACID compliance with @Transactional
+- 📝 **Structured Logging**: Environment-specific logging configuration
 
-1. Clone the repository: `git clone https://github.com/username/repository.git`
-2. Navigate to the project directory: `cd repository`
-3. Compile the project: `gradle build`
-4. Start the application: `gradle bootRun`
+## 🛠️ Requirements
 
-## run application
-1. First, you need to have Docker installed on your machine. If you haven't done so yet, you can download it from the official Docker page.
-2. You will need a docker compose image for postgresql. The next image is a good option: https://hub.docker.com/_/postgres
-   version: '3.8'
-   services:
+- **Java 17**
+- **Gradle 7.x+**
+- **PostgreSQL 12+**
+- **Docker & Docker Compose** (for database)
 
-postgres:
-image: postgres:latest
-environment:
-- POSTGRES_DB=banco-financiera
-- POSTGRES_USER=admin
-- POSTGRES_PASSWORD=admin
-ports:
-- 5432:5432
+## 🚀 Quick Start
 
-copy an paste de text in a file called docker-compose.yml 
-3. Once you have Docker installed, you can run the following command to start a PostgreSQL container: docker compose up console command (in file before created with name docker-compose.yml ) 
+### 1. Database Setup
+Create a `docker-compose.yml` file:
 
-run BancoFinancieraApplication.java
+```yaml
+version: '3.8'
+services:
+  postgres:
+    image: postgres:15
+    container_name: banco-financiera-db
+    environment:
+      - POSTGRES_DB=banco-financiera
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - banco-network
 
-## Endpoints and curls request
-# Creates a new user.
-curl --location 'localhost:8080/api/v1/user/create' \
---header 'Authorization: Basic dXNlcjpwYXNzd29yZA==' \
---header 'Content-Type: application/json' \
---header 'Cookie: JSESSIONID=164417AD50D853715BAE229D6B489B6F' \
---data-raw '{
-"identification_type":"CC",
-"identification_number":12345678923,
-"first_name":"andres",
-"last_name":"perez",
-"email":"somos@soytu.com",
-"birth_date": "1987-12-01"
-}'
-# get all users
-curl --location 'localhost:8080/api/v1/user/get-all' \
---header 'Authorization: Basic dXNlcjpwYXNzd29yZA==' \
---header 'Cookie: JSESSIONID=164417AD50D853715BAE229D6B489B6F'
-# find user by identification_number
-curl --location 'localhost:8080/api/v1/user/12345678915' \
---header 'Authorization: Basic dXNlcjpwYXNzd29yZA==' \
---header 'Cookie: JSESSIONID=164417AD50D853715BAE229D6B489B6F'
-# update user
-curl --location --request PUT 'localhost:8080/api/v1/user/12345678910' \
---header 'Authorization: Basic dXNlcjpwYXNzd29yZA==' \
---header 'Content-Type: application/json' \
---header 'Cookie: JSESSIONID=164417AD50D853715BAE229D6B489B6F' \
---data-raw '{
-"identification_type":"CC",
-"first_name":"juan",
-"last_name":"ibanez",
-"email":"soytu@soyyo.com",
-"birth_date": "2005-12-01"
-}'
-# delete user
-curl --location --request DELETE 'localhost:8080/api/v1/user/12345678910' \
---header 'Authorization: Basic dXNlcjpwYXNzd29yZA==' \
---header 'Cookie: JSESSIONID=164417AD50D853715BAE229D6B489B6F'
-# create product
-curl --location 'localhost:8080/api/v1/products/create/2' \
---header 'Authorization: Basic dXNlcjpwYXNzd29yZA==' \
---header 'Content-Type: application/json' \
---header 'Cookie: JSESSIONID=164417AD50D853715BAE229D6B489B6F' \
---data '{
-"account_type":"current",
-"account_balance":50000,
-"exenta_gmf":false,
-"user_id":2
-}'
-# get all products
-curl --location 'localhost:8080/api/v1/products/all' \
---header 'Authorization: Basic dXNlcjpwYXNzd29yZA==' \
---header 'Cookie: JSESSIONID=164417AD50D853715BAE229D6B489B6F'
-# get product by id
-curl --location --globoff 'localhost:8080/api/v1/products/{id}' \
---header 'Authorization: Basic dXNlcjpwYXNzd29yZA==' \
---header 'Cookie: JSESSIONID=164417AD50D853715BAE229D6B489B6F'
-# update product
-curl --location --globoff --request PUT 'localhost:8080/api/v1/products/{id}' \
---header 'Authorization: Basic dXNlcjpwYXNzd29yZA==' \
---header 'Content-Type: application/json' \
---header 'Cookie: JSESSIONID=164417AD50D853715BAE229D6B489B6F' \
---data '{
-"account_type":"current",
-"account_number":"331234567890",
-"account_balance":2000,
-"status":"active",
-"exenta_gmf":false
-}'
-# delete product
-curl --location --globoff --request DELETE 'localhost:8080/api/v1/products/{id}' \
---header 'Authorization: Basic dXNlcjpwYXNzd29yZA==' \
---header 'Content-Type: application/json' \
---header 'Cookie: JSESSIONID=164417AD50D853715BAE229D6B489B6F' \
---data '{
-"status":"inactive"
-}'
-# update product status
-curl --location --globoff --request PUT 'localhost:8080/api/v1/products/{id}/status' \
---header 'Authorization: Basic dXNlcjpwYXNzd29yZA==' \
---header 'Content-Type: application/json' \
---header 'Cookie: JSESSIONID=164417AD50D853715BAE229D6B489B6F' \
---data '{
-"status":"active"
-}'
-# deposit transaction
-curl --location 'localhost:8080/api/v1/transactions/deposit/1' \
---header 'Authorization: Basic dXNlcjpwYXNzd29yZA==' \
---header 'Content-Type: application/json' \
---header 'Cookie: JSESSIONID=164417AD50D853715BAE229D6B489B6F' \
---data '{
-"amount":2000
-}'
-# withdrawal transaction
-curl --location 'localhost:8080/api/v1/transactions/withdraw/1' \
---header 'Authorization: Basic dXNlcjpwYXNzd29yZA==' \
---header 'Content-Type: application/json' \
---header 'Cookie: JSESSIONID=164417AD50D853715BAE229D6B489B6F' \
---data '{
-"amount":2000
-}'
-# transfer transaction
-curl --location 'localhost:8080/api/v1/transactions/transfer/2/1' \
---header 'Authorization: Basic dXNlcjpwYXNzd29yZA==' \
---header 'Content-Type: application/json' \
---header 'Cookie: JSESSIONID=164417AD50D853715BAE229D6B489B6F' \
---data '{
-"amount":2000
-}'
+volumes:
+  postgres_data:
+
+networks:
+  banco-network:
+    driver: bridge
+```
+
+Start the database:
+```bash
+docker-compose up -d
+```
+
+### 2. Application Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/camounitropico/banco-financiera.git
+cd banco-financiera
+
+# Build the project
+./gradlew build
+
+# Run with dev profile (recommended for development)
+./gradlew bootRun --args='--spring.profiles.active=dev'
+
+# Or run with specific environment variables
+SPRING_PROFILES_ACTIVE=dev ./gradlew bootRun
+```
+
+### 3. Verify Installation
+
+- **Application**: http://localhost:8080
+- **Swagger UI**: http://localhost:8080/swagger-ui.html
+- **Health Check**: http://localhost:8080/actuator/health
+- **API Docs**: http://localhost:8080/v3/api-docs
+
+## 🔐 Authentication
+
+The application uses Basic Authentication with the following default credentials:
+
+| Username | Password | Role |
+|----------|----------|------|
+| `user` | `password` | USER |
+| `admin` | `admin123` | ADMIN, USER |
+
+### Environment Variables
+```bash
+SECURITY_USER_NAME=your_username
+SECURITY_USER_PASSWORD=your_password
+```
+
+## 🌍 Profiles
+
+### Development Profile (`dev`)
+```bash
+./gradlew bootRun --args='--spring.profiles.active=dev'
+```
+- Detailed logging with correlation IDs
+- Swagger UI enabled
+- Full actuator endpoints
+- PostgreSQL database
+
+### Test Profile (`test`)
+```bash
+./gradlew test -Pspring.profiles.active=test
+```
+- H2 in-memory database
+- Minimal logging
+- Swagger disabled
+- Optimized for testing
+
+## 📡 API Endpoints
+
+### User Management
+
+#### Create User
+```bash
+curl -X POST 'localhost:8080/api/v1/user/create' \
+  -H 'Authorization: Basic dXNlcjpwYXNzd29yZA==' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "identification_type": "CC",
+    "identification_number": 12345678923,
+    "first_name": "andres",
+    "last_name": "perez",
+    "email": "somos@soytu.com",
+    "birth_date": "1987-12-01"
+  }'
+```
+
+#### Get All Users
+```bash
+curl -X GET 'localhost:8080/api/v1/user/get-all' \
+  -H 'Authorization: Basic dXNlcjpwYXNzd29yZA=='
+```
+
+#### Find User by Identification
+```bash
+curl -X GET 'localhost:8080/api/v1/user/12345678915' \
+  -H 'Authorization: Basic dXNlcjpwYXNzd29yZA=='
+```
+
+#### Update User
+```bash
+curl -X PUT 'localhost:8080/api/v1/user/12345678910' \
+  -H 'Authorization: Basic dXNlcjpwYXNzd29yZA==' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "identification_type": "CC",
+    "first_name": "juan",
+    "last_name": "ibanez",
+    "email": "soytu@soyyo.com",
+    "birth_date": "2005-12-01"
+  }'
+```
+
+#### Delete User
+```bash
+curl -X DELETE 'localhost:8080/api/v1/user/12345678910' \
+  -H 'Authorization: Basic dXNlcjpwYXNzd29yZA=='
+```
+
+### Product Management
+
+#### Create Product
+```bash
+curl -X POST 'localhost:8080/api/v1/products/create/2' \
+  -H 'Authorization: Basic dXNlcjpwYXNzd29yZA==' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "account_type": "current",
+    "account_balance": 50000,
+    "exenta_gmf": false,
+    "user_id": 2
+  }'
+```
+
+#### Get All Products
+```bash
+curl -X GET 'localhost:8080/api/v1/products/all' \
+  -H 'Authorization: Basic dXNlcjpwYXNzd29yZA=='
+```
+
+#### Get Product by ID
+```bash
+curl -X GET 'localhost:8080/api/v1/products/{id}' \
+  -H 'Authorization: Basic dXNlcjpwYXNzd29yZA=='
+```
+
+### Transaction Management
+
+#### Deposit
+```bash
+curl -X POST 'localhost:8080/api/v1/transactions/deposit/1' \
+  -H 'Authorization: Basic dXNlcjpwYXNzd29yZA==' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "amount": 2000
+  }'
+```
+
+#### Withdrawal
+```bash
+curl -X POST 'localhost:8080/api/v1/transactions/withdraw/1' \
+  -H 'Authorization: Basic dXNlcjpwYXNzd29yZA==' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "amount": 2000
+  }'
+```
+
+#### Transfer
+```bash
+curl -X POST 'localhost:8080/api/v1/transactions/transfer/2/1' \
+  -H 'Authorization: Basic dXNlcjpwYXNzd29yZA==' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "amount": 2000
+  }'
+```
+
+## 🏗️ Architecture & Improvements
+
+### Tech Stack
+- **Spring Boot 3.3.1** - Main framework
+- **Spring Security** - Authentication & authorization
+- **Spring Data JPA** - Data persistence
+- **PostgreSQL** - Primary database
+- **MapStruct** - DTO mapping
+- **Bean Validation** - Input validation
+- **Swagger/OpenAPI 3** - API documentation
+- **Flyway** - Database migrations
+
+### Key Improvements Implemented
+
+#### 🛡️ Enhanced Security
+- BCrypt password encoding
+- Security headers (HSTS, Frame Options)
+- Environment-configurable credentials
+- Role-based access control
+
+#### ✅ Comprehensive Validation
+- Bean Validation annotations on DTOs
+- Custom validation messages
+- Business rule validations
+- Input sanitization
+
+#### 🚨 Advanced Error Handling
+- Layered exception hierarchy (Business, Service, Data)
+- Structured error responses with correlation IDs
+- Specific exceptions for business scenarios:
+  - `InsufficientFundsException`
+  - `AccountNotFoundException`
+  - `UserNotFoundException`
+  - `AccountInactiveException`
+
+#### 📊 Observability
+- Structured logging with correlation IDs
+- Environment-specific log levels
+- Health checks and metrics
+- Application monitoring endpoints
+
+#### 🔄 Transaction Management
+- ACID compliance with `@Transactional`
+- Rollback strategies for failed operations
+- Database connection pooling
+
+## 🧪 Testing
+
+```bash
+# Run all tests
+./gradlew test
+
+# Run tests with coverage
+./gradlew test jacocoTestReport
+
+# Run integration tests
+./gradlew integrationTest
+```
+
+## 📈 Monitoring
+
+### Health Checks
+- **GET** `/actuator/health` - Application health status
+- **GET** `/actuator/info` - Application information
+
+### Logs
+Application logs are available in:
+- **Development**: Console + `logs/banco-financiera-dev.log`
+- **Production**: Console + `logs/banco-financiera.log`
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
